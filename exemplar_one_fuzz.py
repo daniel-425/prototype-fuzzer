@@ -39,7 +39,7 @@ class voltage_monitor(BaseMonitor):
         '''
 
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        sock.sendto("SET_1", (INTERFACE_IP, INTERFACE_WPORT_1))
+        sock.sendto(b"1", (INTERFACE_IP, INTERFACE_WPORT_1))
         
         return True
 
