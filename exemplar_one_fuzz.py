@@ -4,10 +4,10 @@ import socket
 from boofuzz import *
 import threading
 
-INTERFACE_IP = "127.0.0.1"
-LOCAL_INTERFACE = "127.0.0.1"
-INTERFACE_RPORT_1 = 1001
-INTERFACE_WPORT_1 = 2001
+INTERFACE_IP = "192.168.7.100"
+LOCAL_INTERFACE = "192.168.7.5"
+INTERFACE_RPORT_1 = 2001
+INTERFACE_WPORT_1 = 1001
 SLEEP_TIME = 1 
 
 RPROBE_DATA = 3
@@ -20,8 +20,20 @@ def recieve_read_probe_one():
         sock.bind((LOCAL_INTERFACE, INTERFACE_RPORT_1))
         data_raw, addr = sock.recvfrom(5)
 
+        '''test
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.sendto(b"0", (INTERFACE_IP, INTERFACE_WPORT_1))
+        '''
+        
         try:
-            RPROBE_DATA = int(chr(int.from_bytes(data_raw, byteorder="little")))
+            if data_raw == b"\x00":
+                RPROBE_DATA = 0
+            elif data_raw == b"\x01":
+                RPROBE_DATA = 1
+            else:
+                RPROBE_DATA = 3
+            
+            print("RPROBE DATA: {0}".format(RPROBE_DATA))
         except Exception:
             print("WARNING COULDNT CONVERT DATA")
 
@@ -81,6 +93,8 @@ def execute_fuzzer():
     listen_UDP = threading.Thread(target=recieve_read_probe_one)
     listen_UDP.start()
 
+    while(True):
+        continue
     # Create the requestself
     # The format will be {SIZE}:{DATA}. 
     req = Request("FUZZ_REQUEST",children=(
