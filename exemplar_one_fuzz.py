@@ -8,14 +8,16 @@ INTERFACE_IP = "192.168.7.100"
 LOCAL_INTERFACE = "192.168.7.5"
 INTERFACE_RPORT_1 = 2001
 INTERFACE_WPORT_1 = 1001
+INTERFACE_WPORT_2 = 1002
+INTERFACE_WPORT_3 = 1003
 SLEEP_TIME = 1 
 
-RPROBE_DATA = 3
+RPROBE_1_DATA = 3
 
 # A thread that will listen on the probe socket and put into rprobedata
 def recieve_read_probe_one():
     while True:
-        global RPROBE_DATA
+        global RPROBE_1_DATA
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.bind((LOCAL_INTERFACE, INTERFACE_RPORT_1))
         data_raw, addr = sock.recvfrom(5)
@@ -23,19 +25,22 @@ def recieve_read_probe_one():
         '''test
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.sendto(b"0", (INTERFACE_IP, INTERFACE_WPORT_1))
+        sock.sendto(b"1", (INTERFACE_IP, INTERFACE_WPORT_2))
+        sock.sendto(b"0", (INTERFACE_IP, INTERFACE_WPORT_3))
         '''
-        
+
         try:
             if data_raw == b"\x00":
-                RPROBE_DATA = 0
+                RPROBE_1_DATA = 0
             elif data_raw == b"\x01":
-                RPROBE_DATA = 1
+                RPROBE_1_DATA = 1
             else:
-                RPROBE_DATA = 3
+                RPROBE_1_DATA = 3
             
-            print("RPROBE DATA: {0}".format(RPROBE_DATA))
+            print("RPROBE DATA 1: {0}".format(RPROBE_1_DATA))
         except Exception:
             print("WARNING COULDNT CONVERT DATA")
+
 
 class voltage_monitor(BaseMonitor):
     def alive():
@@ -71,14 +76,14 @@ class voltage_monitor(BaseMonitor):
         # Retrun True here if no crash. False if there is a crash. 
         # Read the global rdataprobe to see if there is a crash 
 
-        print("RPROBEDATA: {0}".format(RPROBE_DATA))
+        print("RPROBEDATA: {0}".format(RPROBE_1_DATA))
 
-        if RPROBE_DATA == 0:
+        if RPROBE_1_DATA == 0:
             return False
-        elif RPROBE_DATA == 1:
+        elif RPROBE_1_DATA == 1:
             return True
         else: 
-            raise Exception("Unknown RPROBEDATA: {0}".format(RPROBE_DATA))
+            raise Exception("Unknown RPROBEDATA: {0}".format(RPROBE_1_DATA))
 
     def restart_target(target=None, fuzz_data_logger=None, session=None):
         print("Restart Target")
@@ -93,8 +98,11 @@ def execute_fuzzer():
     listen_UDP = threading.Thread(target=recieve_read_probe_one)
     listen_UDP.start()
 
+    '''test
     while(True):
         continue
+    '''
+    
     # Create the requestself
     # The format will be {SIZE}:{DATA}. 
     req = Request("FUZZ_REQUEST",children=(
