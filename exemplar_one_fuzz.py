@@ -122,7 +122,7 @@ def execute_fuzzer():
         Block("DATA", children=(
         String(name="length", default_value="0010", fuzzable=False),
         String(name="delim", default_value=":", fuzzable=False),
-        FromFile(name="data", filename="regular_run.txt")
+        FromFile(name="data", filename="test_case_files/test_one/regular_run.txt")
     ))))
 
     # Create the sessionData
@@ -130,8 +130,9 @@ def execute_fuzzer():
         target=Target(
             connection=TCPSocketConnection(TARGET_IP, TARGET_PORT),
             #monitors=[]),
-            monitors=[voltage_monitor]),
-        sleep_time=SLEEP_TIME)
+            monitors=[voltage_monitor]),      
+        sleep_time=SLEEP_TIME,
+        crash_threshold_request=1)
 
     session.register_post_test_case_callback(test_case_callback)
 
