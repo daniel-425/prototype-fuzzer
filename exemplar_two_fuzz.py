@@ -6,6 +6,8 @@ import threading
 
 INTERFACE_IP = "192.168.7.100"
 LOCAL_INTERFACE = "192.168.7.5"
+RELAY_IP = "127.0.0.1"
+RELAY_PORT = 1111
 INTERFACE_RPORT_1 = 2001
 INTERFACE_WPORT_1 = 1001
 INTERFACE_WPORT_2 = 1002
@@ -90,26 +92,19 @@ def execute_fuzzer():
 
     listen_UDP = threading.Thread(target=recieve_read_probe_one)
     listen_UDP.start()
-
-    '''test
-    while(True):
-        continue
-    '''
     
-    # Create the requestself
-    # The format will be {SIZE}:{DATA}. 
+    # Create the request
     req = Request("FUZZ_REQUEST",children=(
         Block("DATA", children=(
-        String(name="length", default_value="0010", fuzzable=False),
-        String(name="delim", default_value=":", fuzzable=False),
-        FromFile(name="data", filename="regular_run.txt")
+        FromFile(name="data", filename="test_two_file.txt")
     ))))
 
     # Create the sessionData
     session = Session(
         target=Target(
-            connection=TCPSocketConnection("127.0.0.1", 8021),
-            monitors=[voltage_monitor]),
+            connection=TCPSocketConnection(RELAY_IP, RELAY_PORT),
+            monitors=[]),
+            #monitors=[voltage_monitor]),
         sleep_time=SLEEP_TIME)
 
     # Run the session 
