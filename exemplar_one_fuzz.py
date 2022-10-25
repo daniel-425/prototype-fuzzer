@@ -86,13 +86,24 @@ class voltage_monitor(BaseMonitor):
             return True
         else: 
             raise Exception("Unknown RPROBEDATA: {0}".format(RPROBE_1_DATA))
-
+    
     def restart_target(target=None, fuzz_data_logger=None, session=None):
         print("Restart Target")
         return True
 
     def get_crash_synopsis():
         return True
+
+
+def test_case_callback(target, fuzz_data_logger, session, *args, **kwargs):
+    print("In test case callback")
+    response = target.recv()
+
+    print("Response: {0}".format(response))
+
+    if response == b"REJECT":
+        raise Exception("Target rejected our connection")
+
 
 def execute_fuzzer():
     print("Fuzzing exemplar device 1")
@@ -121,6 +132,8 @@ def execute_fuzzer():
             #monitors=[]),
             monitors=[voltage_monitor]),
         sleep_time=SLEEP_TIME)
+
+    session.register_post_test_case_callback(test_case_callback)
 
     # Run the session 
     session.connect(req)
