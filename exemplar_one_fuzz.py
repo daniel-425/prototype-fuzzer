@@ -6,6 +6,8 @@ import threading
 
 INTERFACE_IP = "192.168.7.100"
 LOCAL_INTERFACE = "192.168.7.5"
+TARGET_IP = "192.168.7.150"
+TARGET_PORT = 1234
 INTERFACE_RPORT_1 = 2001
 INTERFACE_WPORT_1 = 1001
 INTERFACE_WPORT_2 = 1002
@@ -102,7 +104,7 @@ def execute_fuzzer():
     while(True):
         continue
     '''
-    
+
     # Create the requestself
     # The format will be {SIZE}:{DATA}. 
     req = Request("FUZZ_REQUEST",children=(
@@ -115,7 +117,8 @@ def execute_fuzzer():
     # Create the sessionData
     session = Session(
         target=Target(
-            connection=TCPSocketConnection("127.0.0.1", 8021),
+            connection=TCPSocketConnection(TARGET_IP, TARGET_PORT),
+            #monitors=[]),
             monitors=[voltage_monitor]),
         sleep_time=SLEEP_TIME)
 
