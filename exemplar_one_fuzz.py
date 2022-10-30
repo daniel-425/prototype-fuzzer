@@ -3,10 +3,13 @@ from shutil import ExecError
 import socket
 from boofuzz import *
 import threading
+import time
 
-INTERFACE_IP = "192.168.7.100"
 LOCAL_INTERFACE = "192.168.7.5"
-TARGET_IP = "192.168.7.150"
+INTERFACE_IP = "192.168.7.100"
+
+TARGET_IP = "192.168.8.150"
+
 TARGET_PORT = 1234
 INTERFACE_RPORT_1 = 2001
 INTERFACE_WPORT_1 = 1001
@@ -39,7 +42,7 @@ def recieve_read_probe_one():
             else:
                 RPROBE_1_DATA = 3
             
-            print("RPROBE DATA 1: {0}".format(RPROBE_1_DATA))
+            #print("RPROBE DATA 1: {0}".format(RPROBE_1_DATA))
         except Exception:
             print("WARNING COULDNT CONVERT DATA")
 
@@ -77,6 +80,8 @@ class voltage_monitor(BaseMonitor):
         print("Post Send")
         # Retrun True here if no crash. False if there is a crash. 
         # Read the global rdataprobe to see if there is a crash 
+
+        time.sleep(1.5)
 
         print("RPROBEDATA: {0}".format(RPROBE_1_DATA))
 

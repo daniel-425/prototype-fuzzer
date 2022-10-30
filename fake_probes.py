@@ -2,7 +2,7 @@ import threading
 import socket
 from threading import Lock
 
-LOCAL_INTERFACE = "127.0.0.1"
+LOCAL_INTERFACE = "192.168.7.5"
 LISTEN_PORT = 2001
 SEND_PORT = 1001
 RPROBE_DATA = 3
@@ -17,10 +17,12 @@ def recieve_fake_probe():
         sock.bind((LOCAL_INTERFACE, LISTEN_PORT))
         data_raw, addr = sock.recvfrom(5)
 
-        try:
-            RPROBE_DATA = int(chr(int.from_bytes(data_raw, byteorder="little")))
-        except Exception:
-            print("WARNING COULDNT CONVERT DATA")
+        if data_raw ==  b"\x00":
+            RPROBE_DATA = 0
+        elif data_raw == b"\x01":
+            RPROBE_DATA = 1
+        else:
+            RPROBE_DATA = 3
 
         COUNTER += 1
 
@@ -39,8 +41,8 @@ def send_fake_probe():
 listen_UDP = threading.Thread(target=recieve_fake_probe)
 listen_UDP.start()
 
-send_UDP = threading.Thread(target=send_fake_probe)
-send_UDP.start()
+#send_UDP = threading.Thread(target=send_fake_probe)
+#send_UDP.start()
 
 while True:
     continue
